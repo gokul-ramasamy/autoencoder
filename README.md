@@ -1,3 +1,5 @@
+**Training an Autoencoder with Chest X-Rays**
+
 This code corresponds to training an autoencoder with chest x-rays
 
 To start training the model from a saved checkpoint (change the file path as required)
@@ -12,3 +14,6 @@ To test the model by reconstructing the input, run the following (change the fil
 ```
 python3 test.py --file_path "./model/2022-01-18 15:59/epoch_17.pth"
 ```
+The input parameters are provided in *params.json*
+The data generator is defined in *datagen.py*
+The model architecture is defined in *model.py*
