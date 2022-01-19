@@ -1,0 +1,12 @@
+*
+!/.gitignore
+!/README.md
+!/80k_train.txt
+!/test.txt
+!/datagen.py
+!/json_parser.py
+!/model.py
+!/params.json
+!/test.py
+!/train.py
+!/unit_test.py 

@@ -1,0 +1,9 @@
+{
+    "train_text": "./80k_train.txt",
+    "test_text": "./test.txt",
+    "train_batch": 128,
+    "test_batch": 1,
+    "input_size": 256,
+    "model_save_path": "./model/",
+    "results_path": "./results/"
+}
