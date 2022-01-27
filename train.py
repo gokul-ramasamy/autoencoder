@@ -13,6 +13,10 @@ import gc
 from torchinfo import summary
 from json_parser import MODEL_SAVE_PATH, RESULTS_PATH
 import argparse
+import numpy as np
+import tensorflow as tf
+
+from torch.utils.tensorboard import SummaryWriter
 
 
 #Argument parser
@@ -22,7 +26,7 @@ parser.add_argument('--file_path', type=str, required=False)
 args = parser.parse_args()
 
 #use gpu if available
-device = torch.device("cuda:3" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 #Initializing the model
 # Model Initialization
 model = conv_AE()
@@ -37,6 +41,9 @@ loss_function = torch.nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(),
 							lr = 1e-1,
 							weight_decay = 1e-8)
+
+#Learning rate scheduler
+scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, 'min')
 
 #Loading the saved checkpoints
 if args.file_path is not None:
@@ -54,6 +61,9 @@ if args.file_path is not None:
 	CHECKPOINT_PATH = SAVED_CHECKPOINT_PATH.split('/')[-2] + '/'
 	#Extracting the epoch number from the saved checkpoint
 	save_count = int(SAVED_CHECKPOINT_PATH.split('/')[-1].split('.')[0].split('_')[-1]) 
+	#Extracting the previously saved log directory
+	LOG_DIR = './logs/' + CHECKPOINT_PATH
+
 
 #Starting the model training from scratch
 else:
@@ -66,9 +76,19 @@ else:
 	CHECKPOINT_PATH = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")+'/'  #################
 	if not os.path.isdir(MODEL_SAVE_PATH+CHECKPOINT_PATH):
 		os.mkdir(MODEL_SAVE_PATH+CHECKPOINT_PATH)
+
+	#Log directory
+	LOG_DIR = './logs/' + datetime.datetime.now().strftime("%Y-%m-%d %H:%M")+'/'
+	if not os.path.isdir(LOG_DIR):
+		os.mkdir(LOG_DIR)
 	
 	save_count = 0
-	
+
+#list of images for tensorboard logging
+visualise_images = list()
+
+#Creates a file writer for the log directory (loss)
+loss_writer = SummaryWriter(LOG_DIR+'loss')
 
 #Output Generation
 epochs = 1000
@@ -85,12 +105,23 @@ for epoch in range(epochs):
 		image = a_batch['image']
 		image = image[:,None,:,:]
 		image = image.float().to(device)
+
+		#Reshaping for logging the original images
+		img_array = image.detach().cpu().numpy()
+		img_array = np.reshape(img_array, (-1,256,256,1))
 		
 		# Output of Autoencoder
 		reconstructed = model(image)
+
+		#Reshaping for logging the reconstructed images
+		img_array_reconstruct = reconstructed.detach().cpu().numpy()
+		img_array_reconstruct = np.reshape(img_array_reconstruct, (-1,256,256,1))
 			
 		# Calculating the loss function
 		loss = loss_function(reconstructed, image)
+
+		#Scheduler
+		scheduler.step(loss)
 	
 		# The gradients are set to zero,
 		# the the gradient is computed and stored.
@@ -98,7 +129,20 @@ for epoch in range(epochs):
 		optimizer.zero_grad()
 		loss.backward()
 		optimizer.step()
-		
+	
+	#Logging after every epoch
+	#Creates a file writer for the log directory (image)
+	file_writer = tf.summary.create_file_writer(LOG_DIR+'epoch_'+str(epoch+save_count))
+
+	#Using the filewriter, log the reshaped image
+	with file_writer.as_default():
+		tf.summary.image("Training input", img_array, step=0)
+		tf.summary.image("Training output", img_array_reconstruct, step=0)
+	
+	#Using the filewriter, log the loss
+	#Logging the loss 
+	loss_writer.add_scalar('Training Loss', loss, epoch+save_count)
+	
 	#Writing the loss function to a text file
 	with open(RESULTS_PATH+loss_text, 'a') as f:
 		f.writelines(str(loss.detach().cpu().numpy())+'\n')

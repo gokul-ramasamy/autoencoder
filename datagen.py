@@ -120,9 +120,9 @@ class RandomVerticalFlip(object):
 
 train_transformed_dataset = ChestXDataset(data_paths=train_paths,
                                     transform=transforms.Compose([Rescale_Norm(INPUT_SIZE), 
-                                                                ToTensor(),
-                                                                RandomHorizontalFlip(),
-                                                                RandomVerticalFlip()
+                                                                ToTensor()
+                                                                # RandomHorizontalFlip(),
+                                                                # RandomVerticalFlip()
                                                                 ]))
 test_transformed_dataset = ChestXDataset(data_paths=test_paths,
                                     transform=transforms.Compose([Rescale_Norm(INPUT_SIZE),

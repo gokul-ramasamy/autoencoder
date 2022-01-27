@@ -1,7 +1,7 @@
 {
-    "train_text": "./80k_train.txt",
+    "train_text": "./sample_train.txt",
     "test_text": "./test.txt",
-    "train_batch": 128,
+    "train_batch": 64,
     "test_batch": 1,
     "input_size": 256,
     "model_save_path": "./model/",
