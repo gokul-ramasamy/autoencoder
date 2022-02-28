@@ -165,6 +165,8 @@ for epoch in range(epochs):
 	epoch_end_time = time.time()
 	print('>> Epoch time = {}'.format(epoch_end_time-epoch_start_time))
 
+
+######## PLOTTING ###############
 #Writing the losses to a text file
 # losses = [str(i.detach().cpu().numpy())+'\n' for i in losses]
 # with open(RESULTS_PATH+'all_losses.txt', 'a+') as f:
