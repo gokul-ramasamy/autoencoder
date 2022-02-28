@@ -1,6 +1,6 @@
 {
-    "train_text": "./sample_train.txt",
-    "test_text": "./test.txt",
+    "train_text": "./txt_files/cxp_train.txt",
+    "test_text": "./txt_files/test.txt",
     "train_batch": 64,
     "test_batch": 1,
     "input_size": 256,

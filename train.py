@@ -1,3 +1,5 @@
+#This script is to train the model
+
 #Importing the necessary modules
 import torch
 from torchvision import datasets
@@ -29,7 +31,8 @@ args = parser.parse_args()
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 #Initializing the model
 # Model Initialization
-model = conv_AE()
+model = torch.nn.DataParallel(conv_AE(), device_ids = [0,1,2,3])
+
 #Parallelizing the model
 # model = torch.nn.DataParallel(model)
 #Pushing the model to GPU
@@ -102,8 +105,8 @@ for epoch in range(epochs):
 		print("Epoch {}, Batch {}".format(epoch, count))
 		count += 1
 
-		image = a_batch['image']
-		image = image[:,None,:,:]
+		image = a_batch
+		# image = a_batch[:,None,:,:]
 		image = image.float().to(device)
 
 		#Reshaping for logging the original images

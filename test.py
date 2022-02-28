@@ -2,7 +2,7 @@ import torch
 from model import conv_AE
 from matplotlib import pyplot as plt
 import numpy as np
-from datagen import train_dataloader as train_loader
+# from datagen import train_dataloader as train_loader
 from datagen import test_dataloader as test_loader
 import argparse
 

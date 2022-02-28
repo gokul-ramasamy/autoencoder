@@ -5,6 +5,14 @@ from datagen import train_dataloader, test_dataloader
 from model import conv_AE
 
 
+train_paths = list()
+with open("./txt_files/cxp_train.txt", 'r') as f:
+    data = f.readlines()
+    for i in data:
+        train_paths.append(i[:-1])
+
+train_paths = train_paths[:1]
+print(train_paths)
 
 ### TESTING BLOCK BEGIN: datagen.py ###
 #Testing the Dataset Class
@@ -26,6 +34,8 @@ sample_dataset = ChestXDataset(
                                                                 RandomVerticalFlip()
                                                                 ])
 )
+
+exit()
 plt.imshow(sample['image'], cmap='gray')
 plt.show()
 
@@ -44,11 +54,11 @@ for i_batch, sample_batched in enumerate(train_dataloader):
 ### TESTING BLOCK END: datagen.py ###
 
 ### TESTING BLOCK BEGIN: model.py ###
-Model Architecture testing
-use gpu if available
+# Model Architecture testing
+# use gpu if available
 device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
-Initializing the model
-Model Initialization
+# Initializing the model
+# Model Initialization
 model = conv_AE().to(device)
 
 print(summary(model, (1,256,256)))
